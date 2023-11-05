@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Binary Search Tree GUI</title>
+  <link rel="stylesheet" href="style.css"></link>
+</head>
+<body>
+  <div class="tree-info-container">
+    <div class="info-container">
+      <h2>Informações e Travessias</h2>
+      <p><strong>Tamanho:</strong> <span id="size"></span></p>
+      <p><strong>Altura:</strong> <span id="height"></span></p>
+      <p><strong>Menor Elemento:</strong> <span id="min"></span></p>
+      <p><strong>Maior Elemento:</strong> <span id="max"></span></p>
+      <p><strong>Em Ordem:</strong> <span id="in-order"></span></p>
+      <p><strong>Pós Ordem:</strong> <span id="post-order"></span></p>
+      <p><strong>Pré Ordem:</strong> <span id="pre-order"></span></p>
+      <p><strong>Busca em Largura:</strong> <span id="level-order"></span></p>
+      <p><strong>Comprimento Interno:</strong> <span id="internal-path-length"></span></p>
+      <p><strong>Árvore Balanceada:</strong> <span id="is-balanced"></span></p>
+
+    </div>
+    <div class="info-container">
+      <h2>Inserir Nomes</h2>
+      <input type="text" id="name-input">
+      <button id="insert-button">Inserir</button>
+    </div>
+  </div>
+  <div class="tree-container">
+    <svg id="tree-svg"></svg>
+  </div>
+  
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+package estoqueComProdutoPerecivel;
+
+import java.util.ArrayList;
+
+public class ListaDeProdutos {
+
+	ArrayList<Produto> produtos = new ArrayList<Produto>();
+	//private int quant = 0;
+
+	public boolean incluir(Produto p) {
+		for(int i=0; i<produtos.size(); i++){
+			if(produtos.get(i).getCodigo() == p.getCodigo())
+				return false;
+		}
+		produtos.add(p);
+		//quant++;
+		return true;
+		
+	}
+	
+	public Produto pesquisar(int cod) {
+		for(int i=0; i<produtos.size();i++) {
+			if(produtos.get(i).getCodigo() == cod)
+				return produtos.get(i);
+		}
+		
+		return null;
+	}
+
+	/*public int quant(int cod){
+		for(int i=0; i<produtos.size();i++) {
+			if(produtos.get(i).getCodigo() == cod)
+				return produtos.get(i).getQuant();
+		}
+		return 0;	
+	}
+	*/
+	public int getTamanho() {
+		return produtos.size();
+	}
+}

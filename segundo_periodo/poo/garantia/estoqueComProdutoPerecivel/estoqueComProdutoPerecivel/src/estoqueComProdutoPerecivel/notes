@@ -1,0 +1,460 @@
+/*
+	public double vendaPerecivel(int quant) {
+		
+		Date d = new Date(1,1,1);
+		Date dataAtual = new Date();
+		Lote loteMaisProximoDeVencer = new Lote();
+		
+		for(int i=0; i<lotes.size(); i++) {
+			if(lotes.get(i).getValidade().after(d) && lotes.get(i).getValidade().before(dataAtual)) {
+				loteMaisProximoDeVencer = lotes.get(i);
+			}
+		}
+		
+		if(quant < loteMaisProximoDeVencer.getQuant()) {
+			int quantRemovida = loteMaisProximoDeVencer.getQuant() - quant;
+			loteMaisProximoDeVencer.reduzQuant(quantRemovida);
+		}
+		if(quant == loteMaisProximoDeVencer.getQuant()) {
+			lotes.remove(loteMaisProximoDeVencer);
+		}
+		if(quant > loteMaisProximoDeVencer.getQuant()) {
+			lotes.remove(loteMaisProximoDeVencer);
+			int quantRemovida2 = quant - loteMaisProximoDeVencer.getQuant();
+			for(int i=0; i<lotes.size(); i++) {
+				if(lotes.get(i).getValidade().after(d) && lotes.get(i).getValidade().before(dataAtual)) {
+					loteMaisProximoDeVencer = lotes.get(i);
+				}
+			}
+			for(int i=0; i<lotes.size(); i++) {
+				if(lotes.get(i).getValidade().after(d) && lotes.get(i).getValidade().before(dataAtual)) {
+					loteMaisProximoDeVencer = lotes.get(i);
+				}
+			}
+			
+			if(quant < loteMaisProximoDeVencer.getQuant()) {
+				int quantRemovida3 = loteMaisProximoDeVencer.getQuant() - quant;
+				loteMaisProximoDeVencer.reduzQuant(quantRemovida3);
+			}
+			if(quant == loteMaisProximoDeVencer.getQuant()) {
+				lotes.remove(loteMaisProximoDeVencer);
+			}
+			if(quant > loteMaisProximoDeVencer.getQuant()) {
+				lotes.remove(loteMaisProximoDeVencer);
+			}
+		}
+		
+		if(quant <= this.quant) {
+			double valor = quant*precoDeVenda;
+			this.quant -= quant;
+			return valor;
+		}else {
+			return -1;
+		}
+	}
+
+	public void atualizaCustoEProxVencimento() {
+		Node aux = inicio;
+		Date dataAtual = new Date();
+		dataProx = null;
+		int quantTotal = 0;
+		double valTotal = 0.0;
+		while (aux != null) {
+			if (aux.lote.validade.after(dataAtual) && aux.lote.validade.before(dataAtual)) {
+				dataAtual = aux.lote.validade;
+				dataProx = aux.lote.validade;
+			}
+			aux = aux.prox;
+		}
+	}
+	
+	public void compraPerecivel(int quant, double val, Date val2) {
+		//compraProdutoPerecivelComValidadeMenorQueDataAtual
+		
+		precoDeCompra = ((this.quant * precoDeCompra) + quant * val) / (this.quant + quant);
+		this.quant += quant;
+		precoDeVenda = (precoDeCompra * (1 + lucro));
+		
+		Lote lt = new Lote(quant, val2, val);
+		
+		lotes.add(lt);
+	}
+	
+	public double vendaPerecivel(int quant) {
+		Date d = new Date(1,1,1);
+		Date dataAtual = new Date();
+		Lote lotedataProximoDeVencer = new Lote();
+		
+		for(int i=0; i<lotes.size(); i++) {
+			if(lotes.get(i).getValidade().after(d) && lotes.get(i).getValidade().before(dataAtual)) {
+				lotedataProximoDeVencer = lotes.get(i);
+			}
+		}
+		
+
+        double vendaTotal = 0;
+        int i = quant;
+        Node aux = inicio;
+        Node anterior = null;
+        while (aux != null && i != 0) {
+            if (dataProx.equals(aux.lote.validade)) {
+                if ((aux.lote.quant - i) > 0) { // caso sobrar estoque no lote após a venda
+                    vendaTotal += (i * precoFinal);
+                    aux.lote.quant -= i;
+                    atualizaCustoEProxVencimento();
+                    return vendaTotal;
+                } else if ((i - aux.lote.quant) >= 0) { // caso o lote zerar ou não ser suficiente pra vender
+                    i -= aux.lote.quant;
+                    vendaTotal += (aux.lote.quant * precoFinal);
+                    if (aux == inicio) { // apaga o lote atual caso esteja no inico da lista
+                        aux = aux.prox;
+                        inicio = inicio.prox;
+                        atualizaCustoEProxVencimento();
+                        continue;
+                    } else if (aux.prox == null) {
+                        anterior.prox = null;
+                    } else { // apaga o lote atual nas demais posições
+                        anterior.prox = aux.prox;
+                    }
+                    atualizaCustoEProxVencimento();
+                }
+            }
+            anterior = aux;
+            aux = aux.prox;
+        }
+        if (i == 0) {
+            return vendaTotal;
+        } else {
+            return -1;
+        }
+		
+		if(quant <= this.quant) {
+			double valor = quant*precoDeVenda;
+			this.quant -= quant;
+			return valor;
+		}else {
+			return -1;
+		}
+    }
+
+	public boolean getLoteVencido() {
+		Date dataAtual = new Date();
+
+		for(int i=0;i<lotes.size();i++) {
+			if(lotes.get(i).getValidade().before(dataAtual)) {
+				return true;
+			}
+		}
+		return false;
+	}
+*/
+/*
+
+
+package estoqueComProdutoPerecivel;
+import java.util.ArrayList;
+import java.util.Date;
+public class ProdutoPerecivel extends Produto{
+
+	ArrayList<Lote> lotes = new ArrayList<Lote>();
+	
+	protected static class Node{
+		public Lote lote;
+		public Node prox;
+	}
+	public Node inicio = null;
+	
+	Date dataProx = new Date();
+
+	public ProdutoPerecivel(int cod, String desc, int min, double lucro, Fornecedor forn) {
+		super(cod, desc, min, lucro, forn);
+	}
+	
+	public boolean possuiProdutoVencido(){
+		Node aux = inicio;
+		Date dataAtual = new Date();
+		while(aux != null) {
+			if(aux.lote.validade.before(dataAtual)) {
+				return true;
+			}
+			aux = aux.prox;
+		}
+		return false;
+	}
+
+	public int quantVencidoPorProd(){
+		int quantVenc = 0;
+		Node aux = inicio;
+		Date dataAtual = new Date();
+		while(aux != null){
+			if(aux.lote.validade.before(dataAtual)){
+				quantVenc += aux.lote.getQuant();
+			}
+			aux = aux.prox;
+		}
+		return quantVenc;
+	}
+
+	public void insereLista(Lote lote) {
+		Node novo = new Node();
+		novo.lote = lote;
+		novo.prox = null;
+		if(inicio == null){
+			inicio = novo;
+			return;
+		}
+		Node aux = inicio;
+		while(aux != null){
+			if(aux.lote.value == lote.value && aux.lote.validade == lote.validade){
+				aux.lote.quantidade += lote.quantidade;
+				return;
+			}
+			if(aux.prox == null){
+				aux.prox = novo;
+				return;
+			}
+
+			aux = aux.prox;
+		}
+	}
+
+	public void atualizaCustoEProxVencimento() {
+		Node aux = inicio;
+		Date dataAtual = new Date();
+		double cost;
+		dataProx = null;
+		int quantTotal = 0;
+		double valTotal = 0.0;
+		while (aux != null) {
+			if (aux.lote.validade.after(dataAtual)) {
+				if(dataProx == null){
+					dataProx = aux.lote.validade;
+				}else if(aux.lote.validade.before(dataProx)){
+					dataProx = aux.lote.validade;
+				}
+			}
+			quantTotal += aux.lote.quantidade;
+			valTotal += aux.lote.quantidade * aux.lote.value;
+			
+			aux = aux.prox;
+		}
+
+		if(dataProx == null){
+			dataProx = new Date(-1);
+		}
+		
+		cost = valTotal / quantTotal;
+		precoDeCompra = cost + (cost * lucro);
+	}
+	
+	public void compra(int quant, double val, Date val2) {
+		precoDeCompra = ((this.quant * precoDeCompra) + quant * val) / (this.quant + quant);
+		this.quant += quant;
+		precoDeVenda = (precoDeCompra * (1 + lucro));
+		
+		Lote lt = new Lote(quant, val2, val);
+		
+		lotes.add(lt);
+		insereLista(lt);
+		atualizaCustoEProxVencimento();
+	}
+	
+	public double venda(int quant) {
+		Date d = new Date(1,1,1);
+		Date dataAtual = new Date();
+		Lote loteMaisProximoDeVencer = new Lote();
+		
+		for(int i=0; i<lotes.size(); i++) {
+			if(lotes.get(i).getValidade().after(d) && lotes.get(i).getValidade().before(dataAtual)) {
+				loteMaisProximoDeVencer = lotes.get(i);
+			}
+		}
+
+		if(quant < loteMaisProximoDeVencer.getQuant()) {
+			int quantRemovida = loteMaisProximoDeVencer.getQuant() - quant;
+			loteMaisProximoDeVencer.reduzQuant(quantRemovida);
+		}
+		if(quant == loteMaisProximoDeVencer.getQuant()) {
+			lotes.remove(loteMaisProximoDeVencer);
+		}
+		if(quant > loteMaisProximoDeVencer.getQuant()) {
+			quant -= loteMaisProximoDeVencer.getQuant();
+			lotes.remove(loteMaisProximoDeVencer);
+			venda(quant);
+		}
+
+		if(quant<= this.quant){
+			double valor = quant * precoDeVenda;
+			this.quant -= quant;
+			return valor;
+		}else{
+			return -1;
+		}
+		double vendaTotal = 0;
+        int i = quant;
+        Node aux = inicio;
+        Node ant = null;
+        while (aux != null && i != 0) {
+            if (dataProx == aux.lote.validade) {
+				if ((aux.lote.quantidade - i) > 0) { // caso sobrar estoque no lote após a venda
+                    vendaTotal += (i * precoDeCompra);
+                    aux.lote.quantidade -= i;
+                    atualizaCustoEProxVencimento();
+                    return vendaTotal;
+                } else{ // caso o lote zerar ou não ser suficiente pra vender
+                    i -= aux.lote.quantidade;
+                    vendaTotal += (aux.lote.quantidade * precoDeCompra);
+                    if (aux == inicio) { // apaga o lote atual caso esteja no inico da lista
+                        aux = aux.prox;
+                        inicio = inicio.prox;
+                        atualizaCustoEProxVencimento();
+                        continue;
+                    } else if (aux.prox == null) {
+                        ant.prox = null;
+                    } else { // apaga o lote atual nas demais posições
+                        ant.prox = aux.prox;
+                    }
+                    atualizaCustoEProxVencimento();
+                }
+            }
+            ant = aux;
+            aux = aux.prox;
+        }
+        if (i == 0) {
+            return vendaTotal;
+        } else {
+            return -1;
+        }
+
+    }
+
+	public boolean getLoteVencido() {
+		Date dataAtual = new Date();
+
+		for(int i=0;i<lotes.size();i++) {
+			if(lotes.get(i).getValidade().before(dataAtual)) {
+				return true;
+			}
+		}
+		return false;
+	}
+}
+ */
+
+ /*
+  * package estoqueComProdutoPerecivel;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import java.util.ArrayList;
+import java.util.Date;
+import estoqueComProdutoPerecivel.ProdutoPerecivel.Node;
+
+public class Estoque implements InterfaceEstoque {
+
+	private Node inicio = null;
+	ListaDeProdutos produtos = new ListaDeProdutos();
+	public boolean incluir(Produto p) {
+		
+		if((p == null) || (p.getForn().getCnpj() <= 0) || (p.getDesc().isBlank()) || p.getCodigo()<=0)
+			return false;
+		
+		return produtos.incluir(p);
+	}
+
+	public boolean comprar(int cod, int quant, double preco, Date val) {
+		Date dataAtual = new Date();
+
+		if(produtos.pesquisar(cod) == null || quant <= 0 || preco <= 0)
+			return false;
+
+		if (val == null) {
+			produtos.pesquisar(cod).compra(quant, preco, val);
+			return true;
+		}
+		
+		if(val != null && dataAtual.after(val) && !(produtos.pesquisar(cod) instanceof ProdutoPerecivel)) {
+			return false;
+		}
+
+		if(val!=null && produtos.pesquisar(cod) instanceof ProdutoPerecivel){
+			ProdutoPerecivel pp = (ProdutoPerecivel) produtos.pesquisar(cod);
+			pp.compra(quant, preco, val);
+		}else{
+			produtos.pesquisar(cod).compra(quant, preco, val);
+		}
+
+		return true;
+	}
+
+	@Override
+	public double vender(int cod, int quant) {
+		if (produtos.pesquisar(cod) instanceof ProdutoPerecivel) {// confere se é ou n prodperecivel
+			ProdutoPerecivel pp = (ProdutoPerecivel) produtos.pesquisar(cod);
+			return pp.venda(quant);
+		}
+		
+		if(quant <= 0 || produtos.pesquisar(cod) == null || produtos.pesquisar(cod) instanceof ProdutoPerecivel){
+			return -1;
+		}
+
+		return produtos.pesquisar(cod).venda(quant);
+	}
+
+	@Override
+	public Produto pesquisar(int cod) {
+		return produtos.pesquisar(cod);
+	}
+
+	@Override
+	public ArrayList<Produto> estoqueAbaixoDoMinimo() {
+		ArrayList<Produto> produtosAbaixoDoMin = new ArrayList<Produto>();
+
+		for (int i = 0; i < produtos.getTamanho(); i++) {
+			if (produtos.produtos.get(i).getQuant() < produtos.produtos.get(i).getMin()) {
+				produtosAbaixoDoMin.add(produtos.produtos.get(i));
+			}
+		}
+		return produtosAbaixoDoMin;
+	}
+
+	@Override
+	public ArrayList<Produto> estoqueVencido() {
+		ArrayList<Produto> produtosVencidos = new ArrayList<Produto>();
+
+		for (int i = 0; i < produtos.getTamanho(); i++) {
+			if (produtos.produtos.get(i) instanceof ProdutoPerecivel) {
+				ProdutoPerecivel pp = (ProdutoPerecivel) produtos.produtos.get(i);
+				if (pp.getLoteVencido()) {
+					produtosVencidos.add(pp);
+				}
+			}
+		}
+
+		return produtosVencidos;
+	}
+
+	@Override
+	public int quantidadeVencidos(int cod) {
+		
+		int quantVencidos = 0;
+		
+		for (int i = 0; i < produtos.getTamanho(); i++) {
+			if (produtos.produtos.get(i) instanceof ProdutoPerecivel) {
+				ProdutoPerecivel pp = (ProdutoPerecivel) produtos.produtos.get(i);
+				if (pp.getLoteVencido()) {
+					quantVencidos++;
+				}
+			}
+		}
+
+		return quantVencidos;
+	}
+
+    public Fornecedor fornecedor(int i) {
+		return produtos.pesquisar(i).getForn();
+	}
+
+}
+
+  */
