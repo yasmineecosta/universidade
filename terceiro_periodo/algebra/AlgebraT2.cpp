@@ -22,6 +22,7 @@ double matriz_Laplace(vector<vector<double>>& matriz, int l, int c){
     vector<int> sum_line(n, 0), sum_column(n, 0);
     // vector<vector<double>> aux(n-1, vector<double>(n-1));
     l = 0, c=0;
+    int temp_col = -1, temp_line = -1;
     for(int i=0; i<n; i++){
         for(int j=0; j<n; j++){
             if(matriz[i][j] == 0){
@@ -32,8 +33,10 @@ double matriz_Laplace(vector<vector<double>>& matriz, int l, int c){
     }
     
     for(int i=0; i<n; i++){
-        if(sum_line[i] > l){
+        if(sum_line[i] > l && sum_line[i] > temp_line){
             l = i;
+            temp_line = sum_line[i];
+
         }
         if(sum_column[i] > c){
             c = i;
