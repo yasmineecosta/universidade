@@ -27,7 +27,7 @@ class Peer:
     def get_files(self):
         return self.files
 
-    #retorna o endereço do peer
+    #retorna informações do peer
     def __str__(self):
         return f'Peer {self.peer_id} at {self.address}:{self.port}'
 
