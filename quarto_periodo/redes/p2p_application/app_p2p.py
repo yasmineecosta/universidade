@@ -9,4 +9,8 @@ from peer import Peer
 from datetime import datetime
 
 
-
+class Application:
+    def __init__(self):
+        self.peers = []
+        self.peer_id = str(uuid.uuid4())
+        self.address = '
