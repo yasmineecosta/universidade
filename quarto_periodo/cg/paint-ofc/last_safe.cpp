@@ -17,9 +17,6 @@
 #endif
 
 #include <cmath>
-#include <list>
-#include <vector>
-#include <array>
 #include <cstdio>
 #include <cstdlib>
 #include <forward_list>
@@ -29,26 +26,21 @@ using namespace std;
 
 // Variaveis Globais
 #define ESC 27
-#define SPACE 32
+
 
 //Enumeracao com os tipos de formas geometricas
 enum tipo_forma{LIN = 1, TRI, RET, POL, CIR }; // Linha, Triangulo, Retangulo Poligono, Circulo
 enum tipo_transf{TRA = 1, SCA, CIS, REF, ROT};
-enum tipo_fill{TRA_FILL = 1, RET_FILL, POL_FILL};
-enum tipo_FloodFill{FF = 1};
 
 //Verifica se foi realizado o primeiro clique do mouse
 //Instanciando variáveis e booleanos para interação
 bool click1 = false;
 bool click2 = false;
 bool poligon = false;
-bool fillTRIANG = false;
-bool fillRET = false;
-bool fillPOL = false;
 
 //Indica o tipo de forma geometrica ativa para desenhar
 int modo = LIN;
-int transf = TRA;
+
 int i_pol = 0;
 
 //Coordenadas da posicao atual do mouse
@@ -60,7 +52,7 @@ int x_tri[3], y_tri[3];
 int x_origin, y_origin;
 
 //Largura e altura da janela
-int width = 1000, height = 900;
+int width = 1440, height = 900;
 
 // Definicao de vertice
 struct vertice{
@@ -114,19 +106,11 @@ void pushRetang(int x1, int y1, int x2, int y2){
 	pushVertice(x2,y2);
 }
 
-void pushPolig(vector<vertice> &pts){
-	pushForma(POL);
-	for(vector<vertice>::iterator v = pts.begin(); v != pts.end(); ++v){
-		pushVertice(v->x, v->y);	
-	} 
-}
-
 void pushCirc(int x1, int y1, int x2, int y2){
 	pushForma(CIR);
 	pushVertice(x2,y2);
 	pushVertice(x1,y1);
 }
-
 
 /*
  * Declaracoes antecipadas (forward) das funcoes (assinaturas das funcoes)
@@ -137,11 +121,9 @@ void display(void);
 void menu_popup(int value);
 void submenu_Transf(int value);
 void keyboard(unsigned char key, int x, int y);
-void movementKeys(int key, int x, int y);
 void mouse(int button, int state, int x, int y);
 void mousePassiveMotion(int x, int y);
 void drawPixel(int x, int y);
-void borrachaFull();
 // Funcao que percorre a lista de formas geometricas, desenhando-as na tela
 void drawFormas();
 // Funcao que implementa o Algoritmo Imediato para rasterizacao de segmentos de retas
@@ -175,7 +157,6 @@ int main(int argc, char** argv){
     glutMouseFunc(mouse); //funcao callback do mouse
     glutPassiveMotionFunc(mousePassiveMotion); //fucao callback do movimento passivo do mouse
     glutDisplayFunc(display); //funcao callback de desenho
-    glutSpecialFunc(movementKeys);
     
     int submenuTransf = glutCreateMenu(submenu_Transf);
     glutAddMenuEntry("Translacao", TRA);
@@ -191,7 +172,6 @@ int main(int argc, char** argv){
     glutAddMenuEntry("Retangulo", RET);
 	glutAddMenuEntry("Poligono", POL);
 	glutAddMenuEntry("Circulo", CIR);
-	glutAddMenuEntry("Apagar formas (B/b)", -1);
 	glutAddSubMenu("Transformações", submenuTransf);
 	glutAddMenuEntry("Sair", 0);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
@@ -248,96 +228,9 @@ void display(void){
  */
 void menu_popup(int value){
     if (value == 0) exit(EXIT_SUCCESS);
-    if (value ==1) borrachaFull();
-    if (value >= translation && value <= reflection) translation(0,1, formList.front());
     modo = value;
 }
 
-/*
- * Teclas pra usar nas transformacoes
-*/
-void movementKeys(int key, int x, int y){
-	switch(transf){
-		case TRA:
-    		switch(key){
-		  		case GLUT_KEY_UP:
-		  			translation(0, 10);
-		  			glutPostRedisplay();
-		  			break;
-		  		case GLUT_KEY_LEFT:
-		  			translation(-10, 0);
-		  			glutPostRedisplay();
-		  			break;
-		  		case GLUT_KEY_RIGHT:
-					translation(10, 0);
-					glutPostRedisplay();
-				break;
-				case GLUT_KEY_DOWN:
-					translation(0, -10);
-					glutPostRedisplay();
-					break;
-				default:
-					break;
-			}
-		break;
-		case SCA:
-			switch(key){
-				case GLUT_KEY_UP:
-					scaling(1.1, 1.1);
-					glutPostRedisplay();
-					break;
-				case GLUT_KEY_DOWN:
-					scaling(0.9, 0.9);
-					glutPostRedisplay();
-					break;
-			}
-		break;
-		case CIS:
-		   	switch(key){
-				case GLUT_KEY_LEFT:
-					shear(-0.1, 0.0);
-					glutPostRedisplay();
-					break;
-				case GLUT_KEY_RIGHT:
-					shear(0.1, 0.0);
-					glutPostRedisplay();
-					break;	   
-			} break;
-		case REF:
-		   	switch(key){
-				case GLUT_KEY_UP:
-					reflection('x');
-					glutPostRedisplay();
-					break;
-				case GLUT_KEY_DOWN:
-					reflection('x');
-					glutPostRedisplay();
-					break;
-				case GLUT_KEY_LEFT:
-					reflection('y');
-					glutPostRedisplay();
-					break;
-				case GLUT_KEY_RIGHT:
-					reflection('y');
-					glutPostRedisplay();
-					break;	   
-			} break;
-		case ROT:
-			switch(key){
-				 case GLUT_KEY_LEFT:
-					rotation(1);
-					glutPostRedisplay();
-					break;
-				case GLUT_KEY_RIGHT:
-					rotation(-1);
-					glutPostRedisplay(); 	
-					break;
-			} break;
-			
-		default: break;
-	}
-	
-}
 /*
  * Controle das formas por meio de casos
  */
@@ -374,7 +267,6 @@ void keyboard(unsigned char key, int x, int y){
         case 'b': borrachaFull(); break;
 	    case 'B': borrachaFull(); break;
         case 32: // tecla do espaço em ASCII
-        	//poligon = false; breal;
         	if(poligon){
 				poligon: false;
 				x_p[0] = 0;
@@ -453,7 +345,6 @@ void mouse(int button, int state, int x, int y){
                 
                 case POL:
                 	if(state == GLUT_DOWN){
-                		
 						if(click1){
 							swap(x_p[0], x_p[1]);
 							swap(y_p[0], y_p[1]);
@@ -472,22 +363,6 @@ void mouse(int button, int state, int x, int y){
 							pushForma(POL);
 							pushVertice(x_p[0], y_p[0]);
 						}
-						/*
-						vertice vi = {x, height - y - 1};
-						vector<vertice> pol;
-						if (!poligon)
-						{
-							pol.push_back(vi);
-							pushPolig(pol);
-							poligon = true;
-						}
-						else
-						{
-							formList.front().vertexList.push_front(vi);
-							pol.clear();
-							glutPostRedisplay();
-						}
-					*/
 					}
 					break;
 					
@@ -537,7 +412,7 @@ void mousePassiveMotion(int x, int y){
  */
 void drawPixel(int x, int y){
     glBegin(GL_POINTS); // Seleciona a primitiva GL_POINTS para desenhar
-    glVertex2i(x, y);
+        glVertex2i(x, y);
     glEnd();  // indica o fim do ponto
 }
 
@@ -699,7 +574,7 @@ void retaImediata(double x1, double y1, double x2, double y2){
     drawPixel((int)x2,(int)y2);
 }
 
-
+// INCOMPLETO
 void retaBresenham(double x1, double y1, double x2, double y2){
 	
 	double dx, dy, d, incE, incNE, temp;
@@ -824,22 +699,7 @@ void bresenhamCirculo(double x1, double y1, double x2, double y2){
 	}
 }
 
-void translation(int dx, int dy){
-	f = formList.front();
-	if(f.vertexList.empty()) return;
-	for(auto it = f.vertexList.begin(); it != f.vertexList.end(); ++it){
-		vertice& v = *it;
-		v.x += dx;
-		v.y += dy;
-	}
-	centroide(f);
-	glutPostRedisplay();
-}
 
-void scaling(float sx, float sy){
-	for(auto it_form = formList.begin.dfs)
-}
-/*
 void translation(int dx, int dy) {
     for (forward_list<forma>::iterator it_form = formList.begin(); it_form != formList.end(); ++it_form) {
         for (forward_list<vertice>::iterator it_vertex = it_form->vertexList.begin(); it_vertex != it_form->vertexList.end(); ++it_vertex) {
@@ -849,7 +709,6 @@ void translation(int dx, int dy) {
     }
     glutPostRedisplay();
 }
-
 
 void scaling(float sx, float sy) {
     for (auto it_form = formList.begin(); it_form != formList.end(); ++it_form) {
@@ -999,12 +858,11 @@ void rotation(float angle) {
     }
     glutPostRedisplay();
 }
-*/
+
 /*
 
 void fulfill(oq){
 	
 }
 */
-
     

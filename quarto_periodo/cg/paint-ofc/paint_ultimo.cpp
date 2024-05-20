@@ -30,13 +30,14 @@ using namespace std;
 // Variaveis Globais
 #define ESC 27
 #define SPACE 32
+#define TRANSFORM 0
 
 //Enumeracao com os tipos de formas geometricas
-enum tipo_forma{LIN = 1, TRI, RET, POL, CIR }; // Linha, Triangulo, Retangulo Poligono, Circulo
+enum tipo_forma{LIN = 1, TRI, RET, POL, CIR}; // Linha, Triangulo, Retangulo Poligono, Circulo
 enum tipo_transf{TRA = 1, SCA, CIS, REF, ROT};
 enum tipo_fill{TRA_FILL = 1, RET_FILL, POL_FILL};
 enum tipo_FloodFill{FF = 1};
-
+int transformacao_atual = TRANSFORM;
 //Verifica se foi realizado o primeiro clique do mouse
 //Instanciando variáveis e booleanos para interação
 bool click1 = false;
@@ -71,17 +72,41 @@ struct vertice{
 // Definicao das formas geometricas
 struct forma{
     int tipo;
+    float cx, cy;
+    int tX, tY;
     forward_list<vertice> vertexList; //lista encadeada de vertices
+    forma(): tX(0), tY(0) {}
 };
 
 // Lista encadeada de formas geometricas
 forward_list<forma> formList;
+vector<vertice> vertices_cor;
+
+/*
+ * Atualizar o centroide da forma para as transformacoes
+ */
+void centroide(forma& f){
+	if(f.vertexList.empty()) return;
+	float cx = 0, cy = 0;
+	for(auto it = f.vertexList.begin(); it != f.vertexList.end(); ++it){
+		vertice& v = *it;
+		cx += v.x;
+		cy += v.y;
+	}
+	int size = distance(f.vertexList.begin(), f.vertexList.end());
+	cx /= size;
+	cy /= size;
+	f.cx = cx;
+	f.cy = cy;
+}
 
 // Funcao para armazenar uma forma geometrica na lista de formas
 // Armazena sempre no inicio da lista
 void pushForma(int tipo){
     forma f;
     f.tipo = tipo;
+    f.cx = 0; 
+    f.cy = 0;
     formList.push_front(f);
 }
 
@@ -92,6 +117,7 @@ void pushVertice(int x, int y){
     v.x = x;
     v.y = y;
     formList.front().vertexList.push_front(v);
+    centroide(formList.front());
 }
 
 //Fucao para armazenar uma Linha na lista de formas geometricas
@@ -127,6 +153,12 @@ void pushCirc(int x1, int y1, int x2, int y2){
 	pushVertice(x1,y1);
 }
 
+void pushFloodFill(int x1, int y1){
+	vertice v;
+	v.x = x1;
+	v.y = y1;
+	vertices_cor.push_back(v);
+}
 
 /*
  * Declaracoes antecipadas (forward) das funcoes (assinaturas das funcoes)
@@ -144,6 +176,7 @@ void drawPixel(int x, int y);
 void borrachaFull();
 // Funcao que percorre a lista de formas geometricas, desenhando-as na tela
 void drawFormas();
+void centroide(forma& f);
 // Funcao que implementa o Algoritmo Imediato para rasterizacao de segmentos de retas
 void retaImediata(double x1,double y1,double x2,double y2);
 // Funcao que implementa o Algoritmo de Bresenham para rasterizacao de segmentos de retas
@@ -151,11 +184,12 @@ void retaBresenham(double x1, double y1, double x2, double y2);
 // Funcao que implementa o Alg de Bresenham para rasterizacao de circulos
 void bresenhamCirculo(double x1, double y1, double x2, double y2);
 // tentativa de transformações
-void translation(int dx, int dy);
-void scaling(float sx, float sy);
-void shear(float shx, float shy);
-void reflection(bool horizontal, bool vertical);
-void rotation(float angle);
+void floodFill(int x, int y);
+void translation(int dx, int dy,forma& f);
+void scaling(float sx, float sy,forma& f);
+void shear(float shx, float shy,forma& f);
+void reflection(char eixo, forma& f);
+void rotation(float angle, forma& f);
 
 
 /*
@@ -188,10 +222,11 @@ int main(int argc, char** argv){
     glutCreateMenu(menu_popup);
     glutAddMenuEntry("Linha", LIN);
     glutAddMenuEntry("Triangulo", TRI);
-    glutAddMenuEntry("Retangulo", RET);
+    glutAddMenuEntry("Quadrilatero", RET);
 	glutAddMenuEntry("Poligono", POL);
-	glutAddMenuEntry("Circulo", CIR);
-	glutAddMenuEntry("Apagar formas (B/b)", -1);
+	glutAddMenuEntry("Circunferencia", CIR);
+	glutAddMenuEntry("Flood Fill", FF);
+	glutAddMenuEntry("Apagar formas(B/b)", -1);
 	glutAddSubMenu("Transformações", submenuTransf);
 	glutAddMenuEntry("Sair", 0);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
@@ -239,8 +274,9 @@ void display(void){
     drawFormas(); // Desenha as formas geometricas da lista
     //Desenha texto com as coordenadas da posicao do mouse
     draw_text_stroke(0, 0, "(" + to_string(x_m) + "," + to_string(y_m) + ")", 0.2);
+    drawFormas();
+    glPopMatrix();
     glutSwapBuffers(); // manda o OpenGl renderizar as primitivas
-
 }
 
 /*
@@ -248,8 +284,8 @@ void display(void){
  */
 void menu_popup(int value){
     if (value == 0) exit(EXIT_SUCCESS);
-    if (value ==1) borrachaFull();
-    if (value >= translation && value <= reflection) translation(0,1, formList.front());
+    if (value == -1) borrachaFull();
+    if (value >= TRA && value <= REF) translation(0,1, formList.front());
     modo = value;
 }
 
@@ -261,19 +297,19 @@ void movementKeys(int key, int x, int y){
 		case TRA:
     		switch(key){
 		  		case GLUT_KEY_UP:
-		  			translation(0, 10);
+		  			translation(0, 10, formList.front());
 		  			glutPostRedisplay();
 		  			break;
 		  		case GLUT_KEY_LEFT:
-		  			translation(-10, 0);
+		  			translation(-10, 0, formList.front());
 		  			glutPostRedisplay();
 		  			break;
 		  		case GLUT_KEY_RIGHT:
-					translation(10, 0);
+					translation(10, 0, formList.front());
 					glutPostRedisplay();
 				break;
 				case GLUT_KEY_DOWN:
-					translation(0, -10);
+					translation(0, -10, formList.front());
 					glutPostRedisplay();
 					break;
 				default:
@@ -283,11 +319,11 @@ void movementKeys(int key, int x, int y){
 		case SCA:
 			switch(key){
 				case GLUT_KEY_UP:
-					scaling(1.1, 1.1);
+					scaling(1.1, 1.1, formList.front());
 					glutPostRedisplay();
 					break;
 				case GLUT_KEY_DOWN:
-					scaling(0.9, 0.9);
+					scaling(0.9, 0.9, formList.front());
 					glutPostRedisplay();
 					break;
 			}
@@ -295,41 +331,41 @@ void movementKeys(int key, int x, int y){
 		case CIS:
 		   	switch(key){
 				case GLUT_KEY_LEFT:
-					shear(-0.1, 0.0);
+					shear(-0.1, 0.0, formList.front());
 					glutPostRedisplay();
 					break;
 				case GLUT_KEY_RIGHT:
-					shear(0.1, 0.0);
+					shear(0.1, 0.0, formList.front());
 					glutPostRedisplay();
 					break;	   
 			} break;
 		case REF:
 		   	switch(key){
 				case GLUT_KEY_UP:
-					reflection('x');
+					reflection('x', formList.front());
 					glutPostRedisplay();
 					break;
 				case GLUT_KEY_DOWN:
-					reflection('x');
+					reflection('x', formList.front());
 					glutPostRedisplay();
 					break;
 				case GLUT_KEY_LEFT:
-					reflection('y');
+					reflection('y', formList.front());
 					glutPostRedisplay();
 					break;
 				case GLUT_KEY_RIGHT:
-					reflection('y');
+					reflection('y', formList.front());
 					glutPostRedisplay();
 					break;	   
 			} break;
 		case ROT:
 			switch(key){
 				 case GLUT_KEY_LEFT:
-					rotation(1);
+					rotation(1, formList.front());
 					glutPostRedisplay();
 					break;
 				case GLUT_KEY_RIGHT:
-					rotation(-1);
+					rotation(-1, formList.front());
 					glutPostRedisplay(); 	
 					break;
 			} break;
@@ -344,11 +380,11 @@ void movementKeys(int key, int x, int y){
 void submenu_Transf(int value){
 	if (value == 0) exit(EXIT_SUCCESS);
 	switch(value){
-		case 1: translation(50,50); break;
-		case 2: scaling(0.5, 0.5); break;
-		case 3: shear(0.7, 0); break;
-		case 4: reflection(false, true); break;
-		case 5: rotation(45); break;
+		case TRA: transformacao_atual = TRA; break;
+		case SCA: transformacao_atual = SCA; break;
+		case CIS: transformacao_atual = CIS; break;
+		case REF: transformacao_atual = REF; break;
+		case ROT: transformacao_atual = ROT; break;
 	}
 	modo = value;
 }
@@ -359,8 +395,9 @@ void submenu_Transf(int value){
 void borrachaFull(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	formList.clear(); // Remove todas as formas da lista
+	vertices_cor.clear();
 	modo = -1; // Atualiza o modo para um valor não utilizado
-	//drawPol = false; // Reinicia a variável para desenhar polígonos
+	poligon = false; // Reinicia a variável para desenhar polígonos
 
 	glutPostRedisplay();
 }
@@ -453,7 +490,7 @@ void mouse(int button, int state, int x, int y){
                 
                 case POL:
                 	if(state == GLUT_DOWN){
-                		
+                		vector<vertice> pol;
 						if(click1){
 							swap(x_p[0], x_p[1]);
 							swap(y_p[0], y_p[1]);
@@ -507,20 +544,19 @@ void mouse(int button, int state, int x, int y){
 						}
 					}
 					break;
+				/*
+				case FF:
+					if(state == GLUT_DOWN){
+						x_p[0] = x;
+						y_p[0] = height - y - 1;
+						pushFloodFill(x_p[0], y_p[0]);
+						floodFill(x_p[0], y_p[0]);
+					}
+					break;
+					*/
             }
  			break;
 
-//        case GLUT_MIDDLE_BUTTON:
-//            if (state == GLUT_DOWN) {
-//                glutPostRedisplay();
-//            }
-//        break;
-//
-//        case GLUT_RIGHT_BUTTON:
-//            if (state == GLUT_DOWN) {
-//                glutPostRedisplay();
-//            }
-//        break;
     }
 }
 
@@ -641,7 +677,7 @@ void drawFormas(){
   			  	auto start = f->vertexList.begin();
 				auto final = f->vertexList.end();
 				auto aux = start;  
-				while(aux!= final){
+				while(aux != final){
 					auto after = next(aux);
 					if(after == final){  
 						if(poligon && last){
@@ -658,7 +694,33 @@ void drawFormas(){
 }
 
 /*
- * Fucao que implementa o Algoritmo de Rasterizacao da Reta Imediata
+ * Funcao de preenchimento Flood Fill com vizinhanca 4
+ */
+void floodFill(int x, int y){
+	if(x<0 || y<0 || x>width || y>height) return;
+	float pixelColor[3];
+
+	glReadPixels(x, y, 1, 1, GL_RGB, GL_FLOAT, pixelColor);
+	
+	if(pixelColor[0] != 0.0 || pixelColor[1] != 0.0 || pixelColor[2] != 0.0){
+		if(pixelColor[0] == 0.0f && pixelColor[1] == 0.0f && pixelColor[2] == 0.0f) return;
+		glPointSize(1.0f);
+		glColor3f(0.0, 0.0, 0.0);
+		glBegin(GL_POINTS);
+		glVertex2i(x,y);
+		glEnd();
+		pushFloodFill(x, y);
+		glutSwapBuffers();
+		
+		//pixels adjacentes
+		floodFill(x + 1, y);
+		floodFill(x, y + 1);
+		floodFill(x - 1, y);		
+		floodFill(x, y - 1);
+	}
+}
+/*
+ * Funcao que implementa o Algoritmo de Rasterizacao da Reta Imediata
  */
 void retaImediata(double x1, double y1, double x2, double y2){
     double m, b, yd, xd;
@@ -824,8 +886,7 @@ void bresenhamCirculo(double x1, double y1, double x2, double y2){
 	}
 }
 
-void translation(int dx, int dy){
-	f = formList.front();
+void translation(int dx, int dy, forma& f){
 	if(f.vertexList.empty()) return;
 	for(auto it = f.vertexList.begin(); it != f.vertexList.end(); ++it){
 		vertice& v = *it;
@@ -836,9 +897,135 @@ void translation(int dx, int dy){
 	glutPostRedisplay();
 }
 
-void scaling(float sx, float sy){
-	for(auto it_form = formList.begin.dfs)
+void scaling(float sx, float sy, forma& f){
+	if(f.vertexList.empty()) return;
+	for(auto it = f.vertexList.begin(); it != f.vertexList.end(); ++it){
+		vertice& v = *it;
+		float dx = v.x - f.cx;
+		float dy = v.y - f.cy;
+		float dist = sqrt(dx * dx + dy * dy);
+		
+		if((sx > 1 && dist >= 500) || (sx < 1 && dist <= 50))
+		{
+			sx = 1;
+			sy = 1;
+		}
+		// Aplica a transformacao de escala na forma selecionada
+		v.x = round((v.x - f.cx) * sx + f.cx);
+		v.y = round((v.y - f.cy) * sy + f.cy);
+	}
+	centroide(f);
+	glutPostRedisplay();
 }
+
+void shear(float shx, float shy, forma& f){
+	if(f.vertexList.empty()) return;
+	for(auto it = f.vertexList.begin(); it != f.vertexList.end(); ++it){
+		vertice& v = *it;
+		
+		v.x -= f.cx;
+		v.y -= f.cy;
+		
+		float new_x = v.x + shy * v.y;
+		float new_y = v.y + shx * v.x;
+
+		v.x = round(new_x);
+		v.y = round(new_y);
+
+		v.x += f.cx;
+		v.y += f.cy;
+	}
+	
+	glutPostRedisplay();
+}
+
+void reflection(char eixo, forma& f){
+	if(f.vertexList.empty()) return;
+	float signal = (eixo == 'x' ? -1.0 : -1.0);
+ 
+	for (auto it = f.vertexList.begin(); it != f.vertexList.end(); ++it){
+		vertice& v = *it;
+
+		v.x -= f.cx;
+		v.y -= f.cy;
+
+		if (eixo == 'x'){
+			v.y *= signal;
+		}else{
+			v.x *= signal;
+		}
+		v.x += f.cx;
+		v.y += f.cy;
+	}
+
+	glutPostRedisplay();
+}
+
+void rotation(float angle, forma& f) {
+    float radians = angle * 3.14159265 / 180.0;
+	float cosA = cos(radians);
+	float sinA = sin(radians);
+	if(f.vertexList.empty()) return;
+	
+    for (auto it_form = f.vertexList.begin(); it_form != f.vertexList.end(); ++it_form) {
+        vertice& v = *it_form;
+        float dx = v.x - f.cx;
+        float dy = v.y - f.cy;
+        
+        v.x = round(f.cx + dx * cosA - dy * sinA);
+        v.y = round(f.cy + dy * cosA - dx * sinA);
+	}
+	
+    glutPostRedisplay();
+}
+
+/*
+
+void fulfill(oq){
+	
+}
+*/
+
+	/*
+		// Encontrar o centro do objeto
+        float centro_x = 0.0;
+        float centro_y = 0.0;
+
+        // Contar o número de vértices
+        int numVertexes = 0;
+
+        for (auto it_vertex = it_form->vertexList.begin(); it_vertex != it_form->vertexList.end(); ++it_vertex) {
+            centro_x += it_vertex->x;
+            centro_y += it_vertex->y;
+            numVertexes++;
+        }
+
+        if (numVertexes > 0) {
+            centro_x /= numVertexes;
+            centro_y /= numVertexes;
+
+            // Transladar para a origem
+            for (auto it_vertex = it_form->vertexList.begin(); it_vertex != it_form->vertexList.end(); ++it_vertex) {
+                it_vertex->x -= centro_x;
+                it_vertex->y -= centro_y;
+            }
+
+            // Rotacionar
+            for (auto it_vertex = it_form->vertexList.begin(); it_vertex != it_form->vertexList.end(); ++it_vertex) {
+                int x = static_cast<int>(it_vertex->x * cos(radians) - it_vertex->y * sin(radians));
+                int y = static_cast<int>(it_vertex->x * sin(radians) + it_vertex->y * cos(radians));
+                it_vertex->x = x;
+                it_vertex->y = y;
+            }
+
+            // Transladar de volta para a posição original
+            for (auto it_vertex = it_form->vertexList.begin(); it_vertex != it_form->vertexList.end(); ++it_vertex) {
+                it_vertex->x += centro_x;
+                it_vertex->y += centro_y;
+            }
+        }
+    }*/
+
 /*
 void translation(int dx, int dy) {
     for (forward_list<forma>::iterator it_form = formList.begin(); it_form != formList.end(); ++it_form) {
@@ -911,6 +1098,14 @@ void shear(float shx, float shy) {
     glutPostRedisplay();
 }
 
+void reflection(char eixo, forma& f){
+	if(f.vertexList.empty()) return;
+	
+	float signal = (eixo == 'x' ? -1.0 : -1.0);
+	
+	for(auto it = f.vertexList.begin(); 
+}
+/*
 void reflection(bool horizontal, bool vertical) {
     int h = (horizontal) ? -1 : 1;
     int v = (vertical) ? -1 : 1;
@@ -953,57 +1148,6 @@ void reflection(bool horizontal, bool vertical) {
         }
     }
     glutPostRedisplay();
-}
-
-void rotation(float angle) {
-    float radians = angle * 3.14159265 / 180.0;
-
-    for (auto it_form = formList.begin(); it_form != formList.end(); ++it_form) {
-        // Encontrar o centro do objeto
-        float centro_x = 0.0;
-        float centro_y = 0.0;
-
-        // Contar o número de vértices
-        int numVertexes = 0;
-
-        for (auto it_vertex = it_form->vertexList.begin(); it_vertex != it_form->vertexList.end(); ++it_vertex) {
-            centro_x += it_vertex->x;
-            centro_y += it_vertex->y;
-            numVertexes++;
-        }
-
-        if (numVertexes > 0) {
-            centro_x /= numVertexes;
-            centro_y /= numVertexes;
-
-            // Transladar para a origem
-            for (auto it_vertex = it_form->vertexList.begin(); it_vertex != it_form->vertexList.end(); ++it_vertex) {
-                it_vertex->x -= centro_x;
-                it_vertex->y -= centro_y;
-            }
-
-            // Rotacionar
-            for (auto it_vertex = it_form->vertexList.begin(); it_vertex != it_form->vertexList.end(); ++it_vertex) {
-                int x = static_cast<int>(it_vertex->x * cos(radians) - it_vertex->y * sin(radians));
-                int y = static_cast<int>(it_vertex->x * sin(radians) + it_vertex->y * cos(radians));
-                it_vertex->x = x;
-                it_vertex->y = y;
-            }
-
-            // Transladar de volta para a posição original
-            for (auto it_vertex = it_form->vertexList.begin(); it_vertex != it_form->vertexList.end(); ++it_vertex) {
-                it_vertex->x += centro_x;
-                it_vertex->y += centro_y;
-            }
-        }
-    }
-    glutPostRedisplay();
-}
-*/
-/*
-
-void fulfill(oq){
-	
 }
 */
 
