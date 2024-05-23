@@ -1,5 +1,7 @@
 import threading
 import time
+import multiprocessing
+import random
 
 class FIFO:
     
@@ -13,6 +15,7 @@ class FIFO:
     def enqueue(self, elemento):
         with self.lock:
             while self.cheia():
+                print("Fila cheia")
                 self.lock.wait()
             self.fila[self.cauda] = elemento  # insere elemento na cauda
             if self.cauda == len(self.fila) - 1:  # se indice cauda aponta fim do vetor(length-1 pois indice vai de 0 a length-1)
@@ -25,6 +28,7 @@ class FIFO:
     def dequeue(self):
         with self.lock:
             while self.vazia():
+                print("Fila vazia")
                 self.lock.wait()
             valor = self.fila[self.cabeca]  # extrai o primeiro da fila
             if self.cabeca == len(self.fila) - 1:  # se indice cabeca aponta fim do vetor(cabeca vai de 0 a length-1)
@@ -57,7 +61,7 @@ class ConsumerProducer:
                 print(f"Elemento {elemento} produzido")
                 elemento += 1
                 self.fila.lock.notify_all()
-            time.sleep(1)  # pequena pausa para simulação
+            time.sleep(random.uniform(1,3))  # pequena pausa para simulação
 
     def consume(self):
         while True:
@@ -67,7 +71,7 @@ class ConsumerProducer:
                 elemento = self.fila.dequeue()  # retira primeiro da fila
                 print(f"Elemento {elemento} consumido")
                 self.fila.lock.notify_all()
-            time.sleep(1)  # pequena pausa para simulação
+            time.sleep(random.uniform(0.5,4))  # pequena pausa para simulação
 
 
 if __name__ == "__main__":
