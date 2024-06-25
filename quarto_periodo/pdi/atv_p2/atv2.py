@@ -34,6 +34,13 @@ def specify_hist(image, reference):
         cdf_normalized = cdf * hist.max() / cdf.max()
         return cdf_normalized
 
+    def create_lookup(cdf1, cdf2):
+        lookup_table = np.zeros(256, dtype=np.uint8)
+        for i in range(256):
+            diff = np.abs(cdf1[i] - cdf2)
+            lookup_table[i] = np.argmin(diff)
+        return lookup_table
+
     if len(image.shape) == 2:  # Grayscale image
         hist_image, _ = np.histogram(image.flatten(), 256, [0, 256])
         hist_ref, _ = np.histogram(reference.flatten(), 256, [0, 256])
@@ -41,17 +48,25 @@ def specify_hist(image, reference):
         cdf_image = calculate_cdf(hist_image)
         cdf_ref = calculate_cdf(hist_ref)
 
-        cdf_image_normalized = (cdf_image - cdf_image.min()) * 255 / (
-            cdf_image.max() - cdf_image.min())
-        cdf_image_normalized = cdf_image_normalized.astype('uint8')
+        lookup_table = create_lookup(cdf_image, cdf_ref)
+        image_specified = lookup_table[image]
 
-        image_equalized = cdf_image_normalized[image]
-        return image_equalized
-    else:
-        # Implementação para imagens coloridas
-        raise NotImplementedError(
-            "Especificação de histograma para imagens coloridas não está implementada."
-        )
+        return image_specified
+    else:  # Color image
+        image_specified = np.zeros_like(image)
+        for i in range(3):  # Process each channel independently
+            hist_image, _ = np.histogram(image[:, :, i].flatten(), 256,
+                                         [0, 256])
+            hist_ref, _ = np.histogram(reference[:, :, i].flatten(), 256,
+                                       [0, 256])
+
+            cdf_image = calculate_cdf(hist_image)
+            cdf_ref = calculate_cdf(hist_ref)
+
+            lookup_table = create_lookup(cdf_image, cdf_ref)
+            image_specified[:, :, i] = lookup_table[image[:, :, i]]
+
+        return image_specified
 
 
 def rgb_para_hsv(image):
@@ -86,21 +101,64 @@ def exibir_canais_de_cor(image):
 
 
 def exibir_imagem_pb(image):
-    # Converter a imagem para preto e branco (escala de cinza)
-    image_pb = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # Check if the image is already grayscale
+    if len(image.shape) == 2:
+        image_ = image  # If grayscale, no conversion needed
+    else:
+        # Converter a imagem para preto e branco (escala de cinza)
+        image_ = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     # Exibir a imagem em preto e branco
     plt.figure(figsize=(6, 6))
-    plt.imshow(image_pb, cmap='gray')
+    plt.imshow(image_, cmap='gray')
     plt.title('Imagem em Preto e Branco')
     plt.axis('off')  # Ocultar os eixos
     plt.show()
 
 
+def especificar_histogramas_e_mostrar(image, reference):
+    # Especificar histograma
+    specified_image = specify_hist(image, reference)
+
+    # Mostrar histogramas e imagens
+    plt.figure(figsize=(18, 6))
+
+    plt.subplot(2, 3, 1)
+    plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+    plt.title('Imagem Original')
+    plt.axis('off')
+
+    plt.subplot(2, 3, 2)
+    plt.imshow(cv2.cvtColor(reference, cv2.COLOR_BGR2RGB))
+    plt.title('Imagem de Referência')
+    plt.axis('off')
+
+    plt.subplot(2, 3, 3)
+    plt.imshow(cv2.cvtColor(specified_image, cv2.COLOR_BGR2RGB))
+    plt.title('Imagem com Histograma Especificado')
+    plt.axis('off')
+
+    plt.subplot(2, 3, 4)
+    show_hist(image, title="Histograma Original")
+
+    plt.subplot(2, 3, 5)
+    show_hist(reference, title="Histograma de Referência")
+
+    plt.subplot(2, 3, 6)
+    show_hist(specified_image, title="Histograma Especificado")
+
+    plt.show()
+
+
 # Carregar imagem
 # image = cv2.imread('cookies.jpg')
-# image = cv2.imread('donuts.jpg')
+#image = cv2.imread('donuts.jpg')
+#image2 = cv2.imread('rio.jpg')
+
+image2 = cv2.imread('donuts.jpg')
 image = cv2.imread('rio.jpg')
+imagepb = transformar_para_pb(image)
+imagepb2 = transformar_para_pb(image2)
 
 # Exibir histogramas originais
 show_hist(image, title="Histograma Original")
@@ -117,7 +175,12 @@ exibir_canais_de_cor(image_hsv)
 image_pb = transformar_para_pb(image)
 exibir_imagem_pb(image)
 show_hist(image_pb, title="Histograma Preto e Branco")
-
+show_hist(image_hsv, title="Histograma HSV")
+# Especificar histogramas e mostrar resultados
+#image_especify = specify_hist(image, image_pb)
+#show_hist(image_especify, title="Histograma Especificado")
+exibir_imagem_pb(imagepb2)
+especificar_histogramas_e_mostrar(imagepb, imagepb2)
 # Salvar e exibir resultados
 # cv2.imwrite('resultado_equalizado.jpg', image_eq)
 # cv2.imwrite('resultado_pb.jpg', image_pb)
