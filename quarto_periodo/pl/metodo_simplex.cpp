@@ -7,6 +7,7 @@ int colunaPivo;
 double variavel_entrada = 1000;
 double coluna_variavel_entrada;
 double tabela[10][10];
+int desigualdade[10];
 double menorPivo = 1000, elementoPivo;
 int linhaPivo;
 double novaLinhaPivo[10];
@@ -189,19 +190,75 @@ double calcularZ() {
     return Z;
 }
 
-int main() {
-    cout << "Quantas funcoes limitantes? ";
+int menu(int i)
+{
+    int opcao;
+    cout << "1 -> <=\n";
+    cout << "2 -> >=\n";
+    cout << "3 ->  =\n";
+    cout << "Opcao: ";
+    cin >> opcao;
+    desigualdade[i] = opcao;
+
+    return opcao;
+}
+
+int main() 
+{
+    cout << "Quantas restricoes? ";
     cin >> qtdFuncoesLimitantes;
     cout << "Quantos X existem? ";
     cin >> qtdX;
-    totalColunas = qtdX + qtdFuncoesLimitantes + 1;
+
     totalLinhas = qtdFuncoesLimitantes + 1;
+    totalColunas = qtdX + 1;
+
+    for (int i = 0; i < qtdFuncoesLimitantes; i++) 
+    {
+        cout << i + 1 << " restricao\n";
+        if (menu(i) != 3) totalColunas++;
+        cout << endl;
+    }
 
     cout << "Informe os valores da tabela inicial formada linha a linha: \n";
     for (int i = 0; i < totalLinhas; i++) {
-        for (int j = 0; j < totalColunas; j++) {
+        for (int j = 0; j <= qtdX; j++) {
+            if(i == totalLinhas - 1){
+                if(j == qtdX) cout << "Informe o valor da variavel de Z na funcao objetivo(0) : ";
+                else cout << "Informe o valor da variavel " << j+1 << " na funcao objetivo : ";
+            }else{
+                if(j == qtdX) cout << "Informe o valor da restricao " << i + 1 << ": ";
+                else cout << "Informe o valor da restricao " << i + 1 << " e da variavel " << j + 1 << ": ";
+            }
             cin >> tabela[i][j];
         }
+    }
+
+    for (int i = 0; i < totalLinhas; i++)
+    {
+        tabela[i][totalColunas - 1] = tabela[i][qtdX];
+    }
+
+    int temp = qtdX;
+
+    for (int i = 0; i < qtdFuncoesLimitantes; i++)
+    {
+        for (int j = qtdX; j < totalColunas - 1; j++) tabela[i][j] = 0;
+
+        if (desigualdade[i] != 3)
+        {
+            if (desigualdade[i] == 1) tabela[i][temp] = 1;
+            else tabela[i][temp] = -1;
+            temp++;
+        }
+    }
+
+    for (int i = qtdX; i < totalColunas; i++) tabela[qtdFuncoesLimitantes][i] = 0;
+
+    for (int i = 0; i < totalLinhas; i++)
+    {
+        for(int j = 0; j < totalColunas; j++) cout << tabela[i][j] << " ";
+        cout << endl;
     }
 
     // Copiando a última linha para a função objetivo
