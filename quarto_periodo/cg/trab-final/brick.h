@@ -37,7 +37,7 @@ const GLuint faces[N_FACES][3] =
 	{3, 2, 1}
 };
 
-/* Coordenadas de textura dos v�rices de cada tri�ngulo */
+/* Coordenadas de textura dos v?rices de cada tri?ngulo */
 const GLfloat tex_coords[N_FACES][3][2] =
 {
 	{{0.0, 0.0}, {1.0, 1.0}, {0.0, 1.0}},
@@ -161,13 +161,13 @@ void draw_object_smooth(void)
 	calcularNormaisFaces();
 	calcularNormaisVertices();
 
-	/* Desenha todos os tri�ngulos do objecto */
+	/* Desenha todos os tri?ngulos do objecto */
 	glBegin(GL_TRIANGLES);
 	for (i = 0; i < N_FACES; i++)
 	{
 		for (j = 0; j < 3; j++)
 		{
-			/* Define o v�rtice j da face i */
+			/* Define o v?rtice j da face i */
 			glTexCoord2fv(tex_coords[i][j]);
 			glNormal3fv(vertex_normals[faces[i][j]]);
 			glVertex3fv(vertices[faces[i][j]]);
@@ -200,7 +200,7 @@ void parede(int i, int j, GLfloat x, GLfloat y, GLfloat h, GLfloat w)
 
 	glTranslatef (j * h + x, i * w + y, 0.1);
 	
-	glScalef (tam_bloco, tam_bloco, 0.1);
+	glScalef (tam_bloco, tam_bloco, 2.5);
 	
 	draw_object_smooth();
 	
@@ -212,7 +212,7 @@ void lava(int i, int j, GLfloat x, GLfloat y, GLfloat h, GLfloat w)
 {
 	glPushMatrix();
 	
-	glColor3f(0.98, 0.14, 0.0); // Cor preta
+	glColor3f(0.98, 0.14, 0.0); 
 
 	glTranslatef(j * h + x, i * w + y, 0.1);
 	
@@ -227,7 +227,7 @@ void agua(int i, int j, GLfloat x, GLfloat y, GLfloat h, GLfloat w)
 {
 	glPushMatrix();
 	
-	glColor3f(0.20, 0.49, 0.50); // Cor preta
+	glColor3f(0.20, 0.49, 0.70); 
 
 	glTranslatef(j * h + x, i * w + y, 0.1);
 	
@@ -242,7 +242,38 @@ void veneno(int i, int j, GLfloat x, GLfloat y, GLfloat h, GLfloat w)
 {
 	glPushMatrix();
 	
-	glColor3f(0.18, 0.83, 0.03); // Cor preta
+	glColor3f(0.18, 0.83, 0.03); 
+
+	glTranslatef(j * h + x, i * w + y, 0.1);
+	
+	glScalef(tam_bloco, tam_bloco, 2.5); 
+	
+	draw_object_smooth();
+	
+	glPopMatrix();
+}
+
+
+void portalV(int i, int j, GLfloat x, GLfloat y, GLfloat h, GLfloat w)
+{
+	glPushMatrix();
+	
+	glColor3f(1.00, 0.2, 0.2); 
+
+	glTranslatef(j * h + x, i * w + y, 0.1);
+	
+	glScalef(tam_bloco, tam_bloco, 2.5); 
+	
+	draw_object_smooth();
+	
+	glPopMatrix();
+}
+
+void portalA(int i, int j, GLfloat x, GLfloat y, GLfloat h, GLfloat w)
+{
+	glPushMatrix();
+	
+	glColor3f(0.2, 0.2, 1.00); 
 
 	glTranslatef(j * h + x, i * w + y, 0.1);
 	

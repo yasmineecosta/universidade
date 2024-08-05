@@ -24,10 +24,10 @@ using std::stringstream;
 using std::string;
 
 int isFullscreen = 1; // Flag para controlar o estado da tela cheia
-int windowWidth = 800; // Largura padr„o da janela
-int windowHeight = 600; // Altura padr„o da janela
-int windowPosX = 100; // PosiÁ„o X inicial da janela
-int windowPosY = 100; // PosiÁ„o Y inicial da janela
+int windowWidth = 800; // Largura padr√£o da janela
+int windowHeight = 600; // Altura padr√£o da janela
+int windowPosX = 100; // Posi√ß√£o X inicial da janela
+int windowPosY = 100; // Posi√ß√£o Y inicial da janela
 
 /*
  Declaracoes antecipadas (forward) das funcoes (assinaturas das funcoes)
@@ -57,14 +57,14 @@ void toggleFullscreen()
 	
 	if (isFullscreen)
 	{
-		 // Se a janela est· atualmente em tela cheia, vai para ao modo janela
+		 // Se a janela est√° atualmente em tela cheia, vai para ao modo janela
 		glutReshapeWindow(windowWidth, windowHeight);
 		glutPositionWindow(windowPosX, windowPosY);
 		isFullscreen = 0;
 	}
 	else
 	{
-		// Se a janela est· atualmente em modo janela, vai para o modo tela cheia
+		// Se a janela est√° atualmente em modo janela, vai para o modo tela cheia
 		windowWidth = glutGet(GLUT_WINDOW_WIDTH);
 		windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
 		windowPosX = glutGet(GLUT_WINDOW_X);
@@ -98,18 +98,18 @@ void reshape (int w, int h)
 	// Definindo o Viewport para o tamanho da janela
 	glViewport(0, 0, w, h);	
 	
-	//¬ngulo de Vis„o (fovy), ProporÁ„o da Tela (aspect), Plano PrÛximo (near),Plano Distante (far) 
-	gluPerspective(40, (float)w / (float)h, 5.0, 100.0);
+	//√Çngulo de Vis√£o (fovy), Propor√ß√£o da Tela (aspect), Plano Pr√≥ximo (near),Plano Distante (far) 
+	gluPerspective(55, (float)w / (float)h, 5.0, 100.0);
 
 	gluLookAt(
 	
-	   //A c‚mera est· posicionada no ponto:
-		8.5, -5.0, 20.0, 	
+	   //A c√¢mera est√° posicionada no ponto:
+		8.5, 4.0, 23.0, 	
 		
-		//A c‚mera est· olhando para o ponto:
+		//A c√¢mera est√° olhando para o ponto:
 		8.5, 7.0, 0.0, 	
 		
-		//O vetor UP est· definido como:
+		//O vetor UP est√° definido como:
 		0.0, 1.0, 0.0			  
 			  
 	);
@@ -142,7 +142,7 @@ void specialKeys(int key, int x, int y)
 }
 
 /*
- * FunÁ„o Principal
+ * Fun√ß√£o Principal
  */
 int main(int argc, char** argv)
 {
@@ -154,10 +154,10 @@ int main(int argc, char** argv)
 	glutFullScreen();
 
 	init();// Chama funcao init();
-	glutReshapeFunc(reshape);// FunÁ„o callback para redesenhar a tela
-	glutKeyboardFunc(keyboard);// FunÁ„o callback do teclado
-	glutSpecialFunc(specialKeys);// FunÁ„o callback do teclado (teclas especiais)
-	glutDisplayFunc(display);// FunÁ„o callback de desenho
+	glutReshapeFunc(reshape);// Fun√ß√£o callback para redesenhar a tela
+	glutKeyboardFunc(keyboard);// Fun√ß√£o callback do teclado
+	glutSpecialFunc(specialKeys);// Fun√ß√£o callback do teclado (teclas especiais)
+	glutDisplayFunc(display);// Fun√ß√£o callback de desenho
 
 	GLfloat light_position[] = {1.0, 1.0, 1.0, 0.0};
 	GLfloat light_color[] = {0.0, 0.0, 1.0, 0.0};

@@ -6,7 +6,7 @@ using std::stringstream;
 using std::string;
 
 // Defina as constantes para o tamanho do mapa
-#define TAM_X 18
+#define TAM_X 19
 #define TAM_Y 18
 
 float tam_tank = 0.8;
@@ -23,8 +23,9 @@ float tam_tank = 0.8;
 // 1 lava
 // 0 nada
 
-int mapa[TAM_Y][TAM_X] =
+int mapa[TAM_X][TAM_Y] =
 {
+	/*
 	{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
 	{2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
 	{2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
@@ -43,9 +44,30 @@ int mapa[TAM_Y][TAM_X] =
 	{2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2},
 	{2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2},
 	{2, 2, 2, 2, 2, 1, 1, 1, 2, 2, 3, 3, 3, 2, 2, 2, 2, 2},
+	*/
+	{2, 2, 2, 2, 2, 1, 1, 1, 2, 2, 3, 3, 3, 2, 2, 2, 2, 2},
+	{2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2},
+	{2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2},
+	{2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+	{2, 0, 0, 0, 0, 0, 2, 2, 2, 4, 4, 4, 2, 2, 0, 0, 0, 2},
+	{2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+	{2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2},
+	{2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+	{2, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+    {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+	{2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 2},
+	{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 2},
+	{2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 2},
+	{2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+	{2, 2, 2, 2, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+	{2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 5, 2, 2, 6, 2, 2},
+	{2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+	{2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+	{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+		
 };
 
-
+/*
 void desenhaTank(float i, float j, int direcao, int R, int G, int B)
 {
 	//Corpo do tank.
@@ -82,20 +104,20 @@ void desenhaTank(float i, float j, int direcao, int R, int G, int B)
 	glPopMatrix();
 	glPopMatrix();
 }
-
+*/
 void criaMapa()
 {
 	GLfloat w = 1.0, h = 1.0, x = 0, y = 0;
-	for (int i = TAM_X-1; i >= 0; i--)
+	for (int i = 0; i < TAM_X; i++)
 	{
-		for (int j = TAM_Y-1; j >= 0; j--)
+		for (int j = 0; j < TAM_Y; j++)
 		{
-			if (mapa[i][j] == 0) // Claro
+			if (mapa[i][j] == 0) //fundo
 			{
 				
 				fundoMapa(i, j, x, y, h, w);
 			}
-			else if (mapa[i][j] == 1) // Escuro
+			else if (mapa[i][j] == 1) // lava
 			{
 				
 				lava(i, j, x, y, h, w);
@@ -105,15 +127,23 @@ void criaMapa()
 				
 				parede(i, j, x, y, h, w);
 			}
-			else if (mapa[i][j] == 3)
+			else if (mapa[i][j] == 3) //agua
 			{
 				
 				agua(i, j, x, y, h, w);
 			}
-			else if (mapa[i][j] == 4)
+			else if (mapa[i][j] == 4) //veneno
 			{
 				
 				veneno(i, j, x, y, h, w);
+			}
+			else if (mapa[i][j] == 5)
+			{
+				portalV(i, j, x, y, h, w);
+			}
+			else if (mapa[i][j] == 6)
+			{
+				portalA(i, j, x, y, h, w);
 			}
 		}
 	}
