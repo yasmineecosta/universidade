@@ -86,25 +86,42 @@ void desenhaTank(float i, float j, int direcao, int R, int G, int B)
 void criaMapa()
 {
 	GLfloat w = 1.0, h = 1.0, x = 0, y = 0;
-	for (int i = 0; i < TAM_X; i++)
+	for (int i = TAM_X-1; i >= 0; i--)
 	{
-		for (int j = 0; j < TAM_Y; j++)
+		for (int j = TAM_Y-1; j >= 0; j--)
 		{
 			if (mapa[i][j] == 0) // Claro
 			{
 				
-				clara(i, j, x, y, h, w);
+				fundoMapa(i, j, x, y, h, w);
 			}
 			else if (mapa[i][j] == 1) // Escuro
 			{
 				
-				escura(i, j, x, y, h, w);
+				lava(i, j, x, y, h, w);
 			}
-			else if (mapa[i][j] == 2) // Borda
+			else if (mapa[i][j] == 2) // Chao e Paredes
 			{
 				
-				borda(i, j, x, y, h, w);
+				parede(i, j, x, y, h, w);
+			}
+			else if (mapa[i][j] == 3)
+			{
+				
+				agua(i, j, x, y, h, w);
+			}
+			else if (mapa[i][j] == 4)
+			{
+				
+				veneno(i, j, x, y, h, w);
 			}
 		}
 	}
 }
+
+
+// 4 verde
+// 3 agua
+// 2 chao/parede
+// 1 lava
+// 0 fundo
