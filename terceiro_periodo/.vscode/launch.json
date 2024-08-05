@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/yasmi/OneDrive/Documentos/periodoterc/probestatistica",
-      "program": "c:/Users/yasmi/OneDrive/Documentos/periodoterc/probestatistica/build/Debug/outDebug",
+      "cwd": "c:/Users/Yasmine/Desktop/Backup/OneDrive/Documentos/github/universidade/terceiro_periodo/algebra",
+      "program": "c:/Users/Yasmine/Desktop/Backup/OneDrive/Documentos/github/universidade/terceiro_periodo/algebra/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
