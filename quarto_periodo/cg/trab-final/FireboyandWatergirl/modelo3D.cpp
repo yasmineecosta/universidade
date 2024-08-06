@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <cmath>
 #include <map>
+#include <vector>
     // Defina as constantes para o tamanho do mapa
 #define TAM_X 19
 #define TAM_Y 21
@@ -45,6 +46,8 @@
 #define CAMZ 50.0    //posicao da camera no eixo z
 #define CAMX 10.0
 #define CAMY 10.0
+
+vector<pair<double, double> > positions;
 
 int fps_desejado = FPS/2; // variavel para alterar os frames por segundo desejado
 int fps = 0; //contador de frames por segundo
@@ -419,7 +422,7 @@ void drawFloor(GLuint mode){
 			}
 			else if (mapa[i][j] == 2) // Chao e Paredes
 			{
-				
+				positions.push_back({i*1.0,j*1.0});
 				parede(i, j, x, y, h, w);
 			}
 			else if (mapa[i][j] == 3) //agua
@@ -474,7 +477,14 @@ void keyPlayAnimation(int id){
     if(id == jumping) is_jumping = true;
 }
 
-
+bool busca(double pos1, double pos2){
+	for(int i=0; i<positions.size(); i++){
+		if(pos1 == positions[i].first && pos2 == positions[i].second){
+			return true;
+		}
+	}
+	return false;
+}
 /*
  * Controle das teclas comuns
  */
@@ -483,6 +493,9 @@ void keyboard(unsigned char key, int x, int y){
     	
         case SPACE: if(!is_paused) keyPlayAnimation(jumping);
 		   	   	    posy+=2; 
+		   	   	    while(!busca(x,y)){
+						posy--;	  
+					}
 					break; // Tecle SPACE para ativar a animacao de salto
         case 'p':case 'P':
             is_paused = !is_paused;
