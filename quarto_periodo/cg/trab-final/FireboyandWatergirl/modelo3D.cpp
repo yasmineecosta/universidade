@@ -157,9 +157,6 @@ void init_glut(const char *nome_janela, int argc, char** argv){
 
     // Define o menu
     glutCreateMenu(menu);
-    glutAddMenuEntry("Desenhar a azul", 1);
-    glutAddMenuEntry("Desenhar a verde", 2);
-    glutAddMenuEntry("Desenhar a vermelho", 3);
     glutAddMenuEntry("Sair", 0);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
     
@@ -218,16 +215,17 @@ void init_glut(const char *nome_janela, int argc, char** argv){
     faces_animacao = animation->models[0]->numtriangles;
     vertices_animacao = animation->models[0]->numvertices;
     printf(".");
-    animation = glmLoadAnimation("models/ironman/animations/idle", idle, 50);
+    animation = glmLoadAnimation("models/Boy/animations/idle", idle, 500);
     animations[idle] = animation;
     printf(".");
     animation = glmLoadAnimation("models/ironman/animations/bored", bored, 50);
+    //animation = glmLoadAnimation("models/Boy/animations/shooting", shooting, 77);
     animations[bored] = animation;
     printf(".");
-    animation = glmLoadAnimation("models/ironman/animations/jumping", jumping, 50);
+    animation = glmLoadAnimation("models/Boy/animations/jumping", jumping, 58);
     animations[jumping] = animation;
     printf(".");
-    animation = glmLoadAnimation("models/ironman/animations/running", running, 20);
+    animation = glmLoadAnimation("models/Boy/animations/running", running, 22);
     animations[running] = animation;
     printf(" done.\n");
 }
@@ -311,8 +309,6 @@ void display(void){
     glDisable(GL_TEXTURE_2D); //Desativa a Texturizacao 2D para desenhar o texto
     glDisable(GL_LIGHTING); // Desliga a Luz para desenhar o texto
     glColor3f(0.0, 0.0, 0.0); // seleciona a cor preta para o texto
-    float x = -reshape_ratio-0.45;
-    
     
     // Troca os buffers, mostrando o que acabou de ser desenhado
     glutSwapBuffers();
@@ -485,7 +481,9 @@ void keyPlayAnimation(int id){
 void keyboard(unsigned char key, int x, int y){
     switch(key){
     	
-        case SPACE: if(!is_paused) keyPlayAnimation(jumping); break; // Tecle SPACE para ativar a animacao de salto
+        case SPACE: if(!is_paused) keyPlayAnimation(jumping);
+		   	   	    posy+=2; 
+					break; // Tecle SPACE para ativar a animacao de salto
         case 'p':case 'P':
             is_paused = !is_paused;
             animation_id = paused;
