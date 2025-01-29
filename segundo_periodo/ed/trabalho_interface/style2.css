@@ -1,0 +1,104 @@
+html,
+body {
+  height: 100%;
+  width: 100%;
+  background-color: antiquewhite;
+}
+.entrada{
+  display: none;
+}
+#meuInput{
+  height: 30px;
+  font-size: 20px;
+}
+.Enviar{
+  display: inline;
+  width: 80px;
+  height: 30px;
+  color: brown;
+  
+}
+.resposta{
+  font-size: 35px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: block;
+}
+.conteudo{
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 15% 85%;
+}
+.sidebar{
+    display: inline;
+    width: 100%;
+    height: 100%;
+    padding: 0px;
+}
+#minhaTela {
+    display: none;
+    width:1230px;
+    height:302px;
+    background-color: ivory;
+}
+.botoesTravessia{
+  margin-top: 50px;
+  display: grid;
+  grid-template-columns: 20% 20% 20% 20%;
+}
+.tituloResposta{
+  padding-top: 0px;
+  font-size: 45px;
+}
+
+#botaoFechar {
+    margin-top: -72px;   
+    margin-left: auto;
+    margin-bottom: auto;
+    width: 39px;
+    height: 40px;
+    padding: 5px;
+    background-color: transparent;
+    border: none;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+button{
+  position: relative;
+  outline: none;
+  text-decoration: none;
+  border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  text-transform: uppercase;
+  height: 60px;
+  width: 210px;
+  opacity: 1;
+  background-color: #ffffff;
+  border: 1px solid black;
+  width: 100%;
+  height: 100px;
+  border-radius: 0;
+}
+  span{
+      color: rgba(22, 76, 167, 1);
+      font-size: 24px;
+      font-weight: 500;
+      letter-spacing: 0.7px;
+    }
+canvas{
+    
+    display: inline;
+    width: 1230px;
+    height: 800px;
+    border: 0.5px solid black;
+    background-color: ivory;
+}
+header{
+    height: 100px;
+    color:black;
+    text-align: center;
+}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Árvore Binária</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <header>
+    <h1 class="title">Árvore binária</h1>
+  </header>
+
+  <div class="container">
+    <div class="sidebar">
+      <div class="buttons">
+        <button class="button" id="insertBtn">1 - Inserir novo elemento</button>
+        <div class="insert-box">
+          <div class="insert-input">
+            <input type="text" id="nameInput" placeholder="Insira o nome aqui...">
+            <button class="button" id="addBtn">Add</button>
+          </div>
+        </div>
+
+        <button class="button" id="infoBtn">2 - Mostrar informações</button>
+        <!-- mostrar altura, tamanho, menor e maior elemento -->
+        <div class="informacoes">
+          <button class="button" id="infoAltura">Altura:</button>
+          <button class="button" id="infoTamanho">Tamanho:</button>
+          <button class="button" id="infoMenor">Menor elemento:</button>
+          <button class="button" id="infoMaior">Maior elemento:</button>
+        </div>
+
+        <button class="button" id="lengthBtn">3 - Comprimento interno</button>
+        <button class="button" id="balanceBtn">4 - Árvore balanceada</button>
+        <button class="button" id="traversalsBtn">5 - Travessias</button>
+
+      </div>
+
+    </div>
+
+    <div id="screen">
+
+      <h1 class="MainAnswer"></h1>
+      <button id="closeBtn">X</button>
+      <span class="answer"></span>
+      <div class="buttonT">
+        <button class="buttonT" id="in_order">Em Ordem</button>
+        <button class="buttonT" id="pre_order">Pré-Ordem</button>
+        <button class="buttonPOO" id="post_order">Pós Ordem</button>
+        <!-- <button class="buttonTravessia">Level-Ordem</button> -->
+        <button class="buttonLO" if="level_order">Level-Ordem</button>
+      </div>
+
+      <form class="input" action="">
+        <input type="text" name="text" id="Input">
+        <button class="Send" type="submit">Enviar</button>
+      </form>
+
+    </div>
+
+    <canvas id="canvas" width="1231.6" height="802" align="right"></canvas>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
