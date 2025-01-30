@@ -1,0 +1,19 @@
+package yasmineMartinsDaCostaESilva.estoque;
+
+public class Fornecedor {
+	private int CNPJ;
+	private String nome;
+	
+	public Fornecedor(int CNPJ, String nome) {
+		this.CNPJ = CNPJ;
+		this.nome = nome;
+	}
+	
+	public int getCNPJ() {
+		return CNPJ;
+	}
+	
+	public String getNome{
+		return nome;
+	}
+}

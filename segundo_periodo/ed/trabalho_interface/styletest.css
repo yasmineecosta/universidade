@@ -1,0 +1,113 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    /* font-family: Arial, sans-serif; */
+    background-color: #28ede7;
+  }
+  
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px;
+  background-color: #28ede7;
+  border: 1px solid #ccc;
+}
+  
+.title {
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.822);
+  color: #fff;
+  padding: 8px;
+}
+
+.sidebar.buttons{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+  
+  /* .buttons {
+    display: flex;
+    flex-direction: column;
+  } */
+  
+buttons.button {
+  width: 21%;
+  height: 30px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: background-color 0.3s, color 0.3s;
+}
+  
+.button:hover {
+  background-color: #ccc;
+}
+  
+.tree-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px auto;
+}
+  
+.insert-box {
+  /* display: none; */
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  height: 20px;
+  align-items: left;
+}
+  
+.insert-input{
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: 8px;
+  align-items: center;
+}
+
+#nameInput{
+  padding: 10px;
+  border: 1px solic #ccc;
+  border-radius: 4px;
+  outline: none;
+}
+
+.insert-box input {
+  width: 200px;
+  padding: 5px;
+  margin-right: 5px;
+}
+  
+.insert-box .button {
+  width: auto;
+  padding: 10px 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+canvas{
+  width: 100%;
+  height: 100%;
+  display: inline;
+  border: 0.5px solid black;
+  background-color: #cacad4;
+}
+
+header{
+  height: 100px;
+  color:black;
+  text-align: center;
+}

@@ -1,0 +1,10 @@
+/**
+ * 
+ */
+/**
+ * @author yasmi
+ *
+ */
+module yasmineMartinsDaCostaESilva {
+	requires jdk.incubator.vector;
+}

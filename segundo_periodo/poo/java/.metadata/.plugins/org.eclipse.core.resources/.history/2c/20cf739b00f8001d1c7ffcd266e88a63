@@ -1,0 +1,38 @@
+package teste;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+public class UsoDatas {
+
+	
+  public static void main(String[] args) throws ParseException, InterruptedException {
+	 Date data = new Date();
+	 System.out.println(data); 
+	 int dia1 = data.getDate();
+	 int mes1 = data.getMonth();
+	 int ano1 = data.getYear();
+	 int hora = data.getHours();
+	 int minuto = data.getMinutes();
+	 int segundo = data.getSeconds();
+	 System.out.println(dia1);
+	 System.out.println(mes1);
+	 System.out.println(ano1);
+	 
+	 GregorianCalendar gc = new GregorianCalendar();
+	 System.out.println(gc);
+	 int dia = gc.get(gc.DAY_OF_MONTH);
+	 int mes = gc.get(gc.MONTH);
+	 int ano = gc.get(gc.YEAR);
+	 
+	 System.out.println(hora);
+	 System.out.println(minuto);
+	 System.out.println(segundo);
+ 
+	 System.out.println("No calendario gregoriano, fica:");
+
+	 System.out.println(dia + "/" + mes + "/" + ano);
+  }
+}
