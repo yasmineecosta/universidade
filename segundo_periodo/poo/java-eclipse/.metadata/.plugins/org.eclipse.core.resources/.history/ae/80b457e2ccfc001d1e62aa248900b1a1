@@ -1,0 +1,66 @@
+package yasmineMartinsdaCostaESilva.estoque;
+
+import java.util.ArrayList;
+
+public class Produto {
+	private int cod;
+	private String desc;
+	private double precoDeCompra;
+	private double precoDeVenda;
+	private double lucro;
+	private int quant;
+	private int min;
+	private Fornecedor forn;
+	
+	public Produto(int cod, String desc, int min, double lucro, Fornecedor forn) {
+		this.cod = cod;
+		this.desc = desc;
+		this.min = min;
+		this.lucro = lucro;
+		this.forn = forn;
+	}
+	
+	public int getCod() {
+		return cod;
+	}
+	
+	public String getDesc() {
+		return desc;
+	}
+	
+	public double getLucro() {
+		return lucro;
+	}
+	
+	public int getQuant() {
+		return this.quant;
+	}
+	
+	public int getMin() {
+		return min;
+	}
+	
+	public Fornecedor getForn() {
+		return forn;
+	}
+	
+	public void compra(int quant, double val) {
+		if ((quant > 0)) {
+			precoDeCompra = ((this.quant * precoDeCompra) + quant * val) / (this.quant + quant);
+			this.quant += quant;
+			precoDeVenda = (precoDeCompra * (1 + lucro));
+		} else
+			return -1;
+
+	}
+	
+	public double venda(int quant) {
+		if (quant <= this.quant) {
+			double value = quant*precoDeVenda;
+			this.quant = this.quant - quant;
+			return value;
+			
+		} else
+			return -1;
+	}
+}
